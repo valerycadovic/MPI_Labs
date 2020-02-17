@@ -45,6 +45,6 @@ $matrixARows = Read-Host 'Enter matrix A rows count'
 $matrixAColumns = Read-Host 'Enter matrix A columns and matrix B rows count'
 $matrixBColumns = Read-Host 'Enter matrix B columns count'
 
-mpiexec.exe -p 8677 -hosts $ipAddresses.Count $ips -env MPICH_NETMASK '$subnetIp/$mask' -env MPICH_ND_ZCOPY_THRESHOLD -1 -env MPICH_DISABLE_ND 1 -env MPICH_DISABLE_SOCK 0 -affinity .\bin\Debug\netcoreapp3.0\Matrices.exe $matrixARows $matrixAColumns $matrixBColumns
+mpiexec.exe -p 8677 -hosts $ipAddresses.Count $ipAddresses -env MPICH_NETMASK '$subnetIp/$mask' -env MPICH_ND_ZCOPY_THRESHOLD -1 -env MPICH_DISABLE_ND 1 -env MPICH_DISABLE_SOCK 0 -affinity .\bin\Debug\netcoreapp3.0\Matrices.exe $matrixARows $matrixAColumns $matrixBColumns
 
 Read-Host -Prompt "Press Enter to continue"
