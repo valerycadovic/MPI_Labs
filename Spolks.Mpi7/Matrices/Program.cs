@@ -10,33 +10,42 @@ namespace Matrices
     {
         static void Main(string[] args)
         {
-            var matrixA = MatrixService.InitializeByNaturalNumbers(5, 6);
-            var matrixB = MatrixService.InitializeByNaturalNumbers(6, 5);
+            int matrixARows = int.Parse(args[0]);
+            int matrixAColumns = int.Parse(args[1]);
+            int matrixBRows = matrixAColumns;
+            int matrixBColumns = int.Parse(args[2]);
+
+            var matrixA = MatrixService.InitializeByNaturalNumbers(matrixARows, matrixAColumns);
+            var matrixB = MatrixService.InitializeByNaturalNumbers(matrixBRows, matrixBColumns);
 
             using var environment = MpiEnvironmentProvider.MpiEnvironment;
 
+            double startBlocking = Unsafe.MPI_Wtime();
             var matrixC = matrixA.ClusteredMultiplyBy(matrixB);
+            double endBlocking = Unsafe.MPI_Wtime();
             Matrix2D<BigInteger> matrixD = null;
 
             if (matrixC != null)
             {
+                double startNonParallel = Unsafe.MPI_Wtime();
                 matrixD = matrixA.MultiplyBy(matrixB);
-                PrintMatrix(matrixA, true);
-                PrintMatrix(matrixB, true);
-                PrintMatrix(matrixD, true);
-                PrintMatrix(matrixC, true);
-                Console.WriteLine(CompareMatrices(matrixD, matrixC));
+                double endNonParallel = Unsafe.MPI_Wtime();
+
+                Console.WriteLine($"Non parallel execution time: {endNonParallel - startNonParallel}");
+                Console.WriteLine($"Parallel blocking time: {endBlocking - startBlocking}");
+                Console.WriteLine($"Non parallel and blocking results equality: {CompareMatrices(matrixD, matrixC)}");
             }
 
             Communicator.world.Barrier();
 
+            double startNonBlocking = Unsafe.MPI_Wtime();
             var matrixE = matrixA.ClusteredMultiplyByAsync(matrixB);
+            double endNonBlocking = Unsafe.MPI_Wtime();
 
             if (matrixE != null)
             {
-                matrixD = matrixA.MultiplyBy(matrixB);
-                PrintMatrix(matrixE, true);
-                Console.WriteLine(CompareMatrices(matrixD, matrixE));
+                Console.WriteLine($"Non parallel and non blocking results equality: {CompareMatrices(matrixD, matrixE)}");
+                Console.WriteLine($"Parallel non blocking time: {endNonBlocking - startNonBlocking}");
             }
         }
 
