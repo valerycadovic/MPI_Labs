@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 namespace Matrices.Shared
 {
+    [Serializable]
     public class Matrix2D<T> : IEnumerable<T>
     {
         private readonly T[,] _matrix;

@@ -23,9 +23,14 @@ namespace Matrices.Shared.Services
 
         public static (int first, int last) GetFrameIndexes(this Matrix2D<BigInteger> matrix, int rank, int size)
         {
-            int frameSize = matrix.Size / size;
+            return GetFrameIndexes(matrix.Size, rank, size);
+        }
+
+        public static (int first, int last) GetFrameIndexes(int matrixSize, int rank, int size)
+        {
+            int frameSize = matrixSize / size;
             int first = rank * frameSize;
-            int last = rank == size - 1 ? matrix.Size - 1 : first + frameSize - 1;
+            int last = rank == size - 1 ? matrixSize - 1 : first + frameSize - 1;
 
             return (first, last);
         }
