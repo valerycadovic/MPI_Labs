@@ -1,13 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Numerics;
 
 namespace Matrices.Shared.Services
 {
     public static class MatrixDivisionService
     {
-        public static IEnumerable<BigInteger> MultiplyFrame(
-            int first, int last, int columns, Matrix2D<BigInteger> a, Matrix2D<BigInteger> b)
+        public static IEnumerable<long> MultiplyFrame(
+            int first, int last, int columns, Matrix2D<long> a, Matrix2D<long> b)
         {
             for (int absoluteIndex = first; absoluteIndex <= last; absoluteIndex++)
             {
@@ -21,7 +20,7 @@ namespace Matrices.Shared.Services
             }
         }
 
-        public static (int first, int last) GetFrameIndexes(this Matrix2D<BigInteger> matrix, int rank, int size)
+        public static (int first, int last) GetFrameIndexes(this Matrix2D<long> matrix, int rank, int size)
         {
             return GetFrameIndexes(matrix.Size, rank, size);
         }
@@ -35,7 +34,7 @@ namespace Matrices.Shared.Services
             return (first, last);
         }
 
-        public static void CommitFrame(this Matrix2D<BigInteger> result, MatrixFrame frame)
+        public static void CommitFrame(this Matrix2D<long> result, MatrixFrame frame)
         {
             for (int i = frame.First, j = 0; i <= frame.Last; i++, j++)
             {
@@ -43,7 +42,7 @@ namespace Matrices.Shared.Services
             }
         }
 
-        public static void CommitFrame(this Matrix2D<BigInteger> result, int first, int last, BigInteger[] frames)
+        public static void CommitFrame(this Matrix2D<long> result, int first, int last, long[] frames)
         {
             var frame = new MatrixFrame(first, last, frames);
             result.CommitFrame(frame);

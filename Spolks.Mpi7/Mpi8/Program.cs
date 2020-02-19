@@ -1,14 +1,10 @@
 ﻿using System;
 using System.Linq;
-using System.Numerics;
 using System.Text;
 using Matrices.Mpi8.Services;
 using Matrices.Shared;
 using Matrices.Shared.Services;
-using MPI;
-using Environment = System.Environment;
 using MpiEnvironment = MPI.Environment;
-using Matrices.Shared.Extensions;
 
 namespace Matrices.Mpi8
 {
@@ -18,10 +14,10 @@ namespace Matrices.Mpi8
         {
             using var env = new MpiEnvironment(ref args);
 
-            Matrix2D<BigInteger> matrixA = MatrixService.InitializeByNaturalNumbers(300, 300);
-            Matrix2D<BigInteger> matrixB = MatrixService.InitializeByNaturalNumbers(300, 300);
+            Matrix2D<long> matrixA = MatrixService.InitializeByNaturalNumbers(300, 300);
+            Matrix2D<long> matrixB = MatrixService.InitializeByNaturalNumbers(300, 300);
 
-            const int groups = 6;
+            const int groups = 2;
 
             MatrixGroupingClusteringService.MultiplyInGroups(matrixA, matrixB, groups);
         }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Numerics;
 using Matrices.Mpi7.Services;
 using Matrices.Shared;
 using Matrices.Shared.Services;
@@ -28,7 +27,7 @@ namespace Matrices.Mpi7
             double startBlocking = MPI_Wtime();
             var matrixC = matrixA.ClusteredMultiplyBy(matrixB);
             double endBlocking = MPI_Wtime();
-            Matrix2D<BigInteger> matrixD = null;
+            Matrix2D<long> matrixD = null;
 
             if (matrixC != null)
             {

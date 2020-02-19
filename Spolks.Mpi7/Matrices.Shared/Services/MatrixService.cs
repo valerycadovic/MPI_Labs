@@ -1,19 +1,18 @@
 ﻿using System;
 using System.Linq;
-using System.Numerics;
 
 namespace Matrices.Shared.Services
 {
     public static class MatrixService
     {
-        public static Matrix2D<BigInteger> MultiplyBy(this Matrix2D<BigInteger> self, Matrix2D<BigInteger> multiplier)
+        public static Matrix2D<long> MultiplyBy(this Matrix2D<long> self, Matrix2D<long> multiplier)
         {
             if (self.Columns != multiplier.Rows)
             {
                 throw new ArithmeticException("these matrices cannot be multiplied due to sizes mismatch");
             }
 
-            var result = Matrix2D<BigInteger>.CreateEmpty(self.Rows, multiplier.Columns);
+            var result = Matrix2D<long>.CreateEmpty(self.Rows, multiplier.Columns);
 
             for (int i = 0; i < self.Rows; i++)
             {
@@ -29,7 +28,7 @@ namespace Matrices.Shared.Services
             return result;
         }
 
-        public static bool CompareMatrices(Matrix2D<BigInteger> a, Matrix2D<BigInteger> b)
+        public static bool CompareMatrices(Matrix2D<long> a, Matrix2D<long> b)
         {
             if (a.Columns != b.Columns || a.Rows != b.Rows)
             {
@@ -39,9 +38,9 @@ namespace Matrices.Shared.Services
             return a.Zip(b).All(tuple => tuple.First == tuple.Second);
         }
 
-        public static Matrix2D<BigInteger> InitializeByNaturalNumbers(int rows, int columns)
+        public static Matrix2D<long> InitializeByNaturalNumbers(int rows, int columns)
         {
-            var result = Matrix2D<BigInteger>.CreateEmpty(rows, columns);
+            var result = Matrix2D<long>.CreateEmpty(rows, columns);
 
             for (int i = 0; i < result.Size; i++)
             {

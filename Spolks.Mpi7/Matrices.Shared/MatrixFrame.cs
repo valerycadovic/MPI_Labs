@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Numerics;
 
 namespace Matrices.Shared
 {
@@ -10,9 +9,9 @@ namespace Matrices.Shared
 
         public int Last { get; }
 
-        public BigInteger[] Results { get; }
+        public long[] Results { get; }
 
-        public MatrixFrame(int first, int last, BigInteger[] results)
+        public MatrixFrame(int first, int last, long[] results)
         {
             First = first;
             Last = last;
