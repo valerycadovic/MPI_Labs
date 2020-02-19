@@ -9,4 +9,8 @@
     <PackageReference Include="MPI.NET" Version="1.4.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Matrices.Shared\Matrices.Shared.csproj" />
+  </ItemGroup>
+
 </Project>

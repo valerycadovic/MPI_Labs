@@ -1,10 +1,14 @@
 ﻿using System;
-using System.Linq;
 using System.Numerics;
-using Matrices.Services;
+using Matrices.Mpi7.Services;
+using Matrices.Shared;
+using Matrices.Shared.Services;
 using MPI;
+using MpiEnvironment = MPI.Environment;
+using static MPI.Unsafe;
+using static Matrices.Shared.Services.MatrixService;
 
-namespace Matrices
+namespace Matrices.Mpi7
 {
     class Program
     {
@@ -15,21 +19,22 @@ namespace Matrices
             int matrixBRows = matrixAColumns;
             int matrixBColumns = int.Parse(args[2]);
 
-            var matrixA = MatrixService.InitializeByNaturalNumbers(matrixARows, matrixAColumns);
-            var matrixB = MatrixService.InitializeByNaturalNumbers(matrixBRows, matrixBColumns);
+            var matrixA = InitializeByNaturalNumbers(matrixARows, matrixAColumns);
+            var matrixB = InitializeByNaturalNumbers(matrixBRows, matrixBColumns);
 
-            using var environment = MpiEnvironmentProvider.MpiEnvironment;
+            string[] mpiArgs = { };
+            using var environment = new MpiEnvironment(ref mpiArgs);
 
-            double startBlocking = Unsafe.MPI_Wtime();
+            double startBlocking = MPI_Wtime();
             var matrixC = matrixA.ClusteredMultiplyBy(matrixB);
-            double endBlocking = Unsafe.MPI_Wtime();
+            double endBlocking = MPI_Wtime();
             Matrix2D<BigInteger> matrixD = null;
 
             if (matrixC != null)
             {
-                double startNonParallel = Unsafe.MPI_Wtime();
+                double startNonParallel = MPI_Wtime();
                 matrixD = matrixA.MultiplyBy(matrixB);
-                double endNonParallel = Unsafe.MPI_Wtime();
+                double endNonParallel = MPI_Wtime();
 
                 Console.WriteLine($"Non parallel execution time: {endNonParallel - startNonParallel}");
                 Console.WriteLine($"Parallel blocking time: {endBlocking - startBlocking}");
@@ -38,41 +43,14 @@ namespace Matrices
 
             Communicator.world.Barrier();
 
-            double startNonBlocking = Unsafe.MPI_Wtime();
+            double startNonBlocking = MPI_Wtime();
             var matrixE = matrixA.ClusteredMultiplyByAsync(matrixB);
-            double endNonBlocking = Unsafe.MPI_Wtime();
+            double endNonBlocking = MPI_Wtime();
 
             if (matrixE != null)
             {
                 Console.WriteLine($"Non parallel and non blocking results equality: {CompareMatrices(matrixD, matrixE)}");
                 Console.WriteLine($"Parallel non blocking time: {endNonBlocking - startNonBlocking}");
-            }
-        }
-
-        static bool CompareMatrices(Matrix2D<BigInteger> a, Matrix2D<BigInteger> b)
-        {
-            if (a.Columns != b.Columns || a.Rows != b.Rows)
-            {
-                return false;
-            }
-
-            return a.Zip(b).All(tuple => tuple.First == tuple.Second);
-        }
-
-        static void PrintMatrix(Matrix2D<BigInteger> matrix, bool withDelimiter = false)
-        {
-            foreach (var row in matrix.GetRows())
-            {
-                foreach (var item in row)
-                {
-                    Console.Write($"{item}\t");
-                }
-                Console.WriteLine();
-            }
-
-            if (withDelimiter)
-            {
-                Console.WriteLine("------------------------------------");
             }
         }
     }

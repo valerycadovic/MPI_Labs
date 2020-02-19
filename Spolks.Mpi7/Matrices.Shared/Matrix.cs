@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Matrices
+namespace Matrices.Shared
 {
     public class Matrix2D<T> : IEnumerable<T>
     {

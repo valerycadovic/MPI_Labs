@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Linq;
 using System.Numerics;
-using MPI;
-using MpiEnvironment = MPI.Environment;
 
-namespace Matrices.Services
+namespace Matrices.Shared.Services
 {
     public static class MatrixService
     {
@@ -31,20 +29,14 @@ namespace Matrices.Services
             return result;
         }
 
-        public static Matrix2D<BigInteger> GenerateRandomly(int rows, int columns, int min = 0, int max = 100)
+        public static bool CompareMatrices(Matrix2D<BigInteger> a, Matrix2D<BigInteger> b)
         {
-            var result = Matrix2D<BigInteger>.CreateEmpty(rows, columns);
-            var random = new Random();
-
-            for (int i = 0; i < result.Rows; i++)
+            if (a.Columns != b.Columns || a.Rows != b.Rows)
             {
-                for (int j = 0; j < result.Columns; j++)
-                {
-                    result[i, j] = random.Next(min, max);
-                }
+                return false;
             }
 
-            return result;
+            return a.Zip(b).All(tuple => tuple.First == tuple.Second);
         }
 
         public static Matrix2D<BigInteger> InitializeByNaturalNumbers(int rows, int columns)
