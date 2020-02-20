@@ -72,11 +72,11 @@ namespace Matrices.Mpi8.Services
             int rank = communicator.Rank;
 
             int resultSize = self.Rows * multiplier.Columns;
-            var frameRange = MatrixDivisionService.GetFrameIndexes(resultSize, rank, size);
-            int[] counts = GetCounts(resultSize, size);
+            int[] counts = Arrays.equalPartLengths(resultSize, size).ToArray();
+            var (firstIndex, lastIndex) = Arrays.getPartIndicesRange(counts, rank);
 
             long[] localResult = MatrixDivisionService.MultiplyFrame(
-                frameRange.first, frameRange.last, multiplier.Columns,
+                firstIndex, lastIndex, multiplier.Columns,
                 self, multiplier).ToArray();
 
             if (rank == MasterRank)
@@ -91,16 +91,6 @@ namespace Matrices.Mpi8.Services
             communicator.GatherFlattened(localResult, counts, MasterRank);
 
             return null;
-        }
-
-        private static int[] GetCounts(int matrixSize, int communicatorSize)
-        {
-            var division = matrixSize.DivideWithRemainder(communicatorSize);
-
-            return Enumerable
-                .Repeat(division.result, communicatorSize - 1)
-                .Append(division.result + division.remainder)
-                .ToArray();
         }
     }
 }
