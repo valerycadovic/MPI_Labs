@@ -11,7 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Matrices.Shared.Recursive\Matrices.Shared.FsharpExtensions.fsproj" />
+    <ProjectReference Include="..\Matrices.Shared.FsharpExtensions\Matrices.Shared.FsharpExtensions.fsproj" />
     <ProjectReference Include="..\Matrices.Shared\Matrices.Shared.csproj" />
   </ItemGroup>
 

@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29409.12
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Matrices.Mpi7", "Matrices\Matrices.Mpi7.csproj", "{7179A74C-9590-422E-8451-9A87849DFEEC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Matrices.Mpi7", "Matrices.Mpi7\Matrices.Mpi7.csproj", "{7179A74C-9590-422E-8451-9A87849DFEEC}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Matrices.Mpi8", "Mpi8\Matrices.Mpi8.csproj", "{CDF8034F-B5E0-4088-9ABF-9BB58F5F98DF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Matrices.Mpi8", "Matrices.Mpi8\Matrices.Mpi8.csproj", "{CDF8034F-B5E0-4088-9ABF-9BB58F5F98DF}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Matrices.Shared", "Matrices.Shared\Matrices.Shared.csproj", "{08FA7E55-65FD-4A1E-BDF0-52B2CC7CFBF0}"
 EndProject
-Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Matrices.Shared.FsharpExtensions", "Matrices.Shared.Recursive\Matrices.Shared.FsharpExtensions.fsproj", "{5E3E444A-4EC7-43D7-AE64-04F2498478E8}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Matrices.Shared.FsharpExtensions", "Matrices.Shared.FsharpExtensions\Matrices.Shared.FsharpExtensions.fsproj", "{5E3E444A-4EC7-43D7-AE64-04F2498478E8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

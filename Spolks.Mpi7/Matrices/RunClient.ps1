@@ -1,2 +1,0 @@
-msmpilaunchsvc.exe
-start (smpd -d 0 -p 8677)
