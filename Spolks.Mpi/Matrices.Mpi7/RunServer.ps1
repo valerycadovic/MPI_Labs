@@ -12,21 +12,34 @@ $ref = $null
 for ($i = 0; $i -lt $hosts; $i++) {
     $address = Read-Host 'Enter ip address of host' $i
     if (-not [ipaddress]::TryParse($address, [ref]$ref)) {
+        Write-Host 'Wrong IP address format'
         $i--
         continue
     }
 
-    $ipAddresses.Add($address)
-}
+    $processes = 0
+    do {
+        $isValid = [int]::TryParse((Read-Host 'Enter count of processes of host' $i), [ref]$processes)
+        if (-not $isValid -or $processes -lt 0) {
+            Write-Host 'Count of processes should be a positive integer number'
+        }
+    } while (-not $isValid -or $processes -lt 0)
 
+    $ipAddresses.Add($address) 
+    $ipAddresses.Add($processes)
+}
 $ips = [string]::Join(' ', $ipAddresses)
 
-smpd -d 0 -p 8677
+Start-Process -FilePath "smpd.exe" -ArgumentList ("-p", "8677", "-d", "0")
+$smpd = Get-Process -Name "smpd"
 
 $matrixARows = Read-Host 'Enter matrix A rows count'
 $matrixAColumns = Read-Host 'Enter matrix A columns and matrix B rows count'
 $matrixBColumns = Read-Host 'Enter matrix B columns count'
 
-mpiexec.exe -p 8677 -hosts $ipAddresses.Count $ipAddresses -env .\bin\Debug\netcoreapp3.0\Matrices.Mpi7.exe $matrixARows $matrixAColumns $matrixBColumns
+$count = $ipAddresses.Count / 2
+
+mpiexec.exe -p 8677 -hosts $count $ipAddresses -env .\bin\Debug\netcoreapp3.0\Matrices.Mpi7.exe $matrixARows $matrixAColumns $matrixBColumns
 
 Read-Host -Prompt "Press Enter to continue"
+Stop-Process -InputObject $smpd

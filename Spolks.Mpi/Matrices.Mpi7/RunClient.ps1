@@ -1,1 +1,1 @@
-start (smpd -d 3 -p 8677)
+smpd -d 3 -p 8677
