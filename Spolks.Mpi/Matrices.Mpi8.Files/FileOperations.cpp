@@ -75,6 +75,7 @@ void FilesMultiplication::FileOperations::MultiplyToFile(
 	}
 
 	MPI_File_write_ordered(file, localResult_ptr, localResult->Length, MPI_LONG_LONG, MPI_STATUS_IGNORE);
+	MPI_File_close(&file);
 }
 
 Matrix2D<long long>^ FilesMultiplication::FileOperations::ReadMatrix(const char* filePath, MPI_Comm communicator)
@@ -100,6 +101,7 @@ Matrix2D<long long>^ FilesMultiplication::FileOperations::ReadMatrix(const char*
 
 	long long* buffer;
 	MPI_File_read_at_all(file, 2, buffer, length, MPI_LONG_LONG, MPI_STATUSES_IGNORE);
+	MPI_File_close(&file);
 
 	Matrix2D<long long>^ matrix = MatrixSerializer::DeserializeMatrix(rows, columns, buffer);
 
