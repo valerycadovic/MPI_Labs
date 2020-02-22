@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Matrices.Shared", "Matrices
 EndProject
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Matrices.Shared.FsharpExtensions", "Matrices.Shared.FsharpExtensions\Matrices.Shared.FsharpExtensions.fsproj", "{5E3E444A-4EC7-43D7-AE64-04F2498478E8}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Matrices.Mpi8.Files", "Matrices.Mpi8.Files\Matrices.Mpi8.Files.vcxproj", "{319DF7A8-DC73-4760-9190-7AF7BEA38ACF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -69,6 +71,17 @@ Global
 		{5E3E444A-4EC7-43D7-AE64-04F2498478E8}.Release|x64.Build.0 = Release|Any CPU
 		{5E3E444A-4EC7-43D7-AE64-04F2498478E8}.Release|x86.ActiveCfg = Release|Any CPU
 		{5E3E444A-4EC7-43D7-AE64-04F2498478E8}.Release|x86.Build.0 = Release|Any CPU
+		{319DF7A8-DC73-4760-9190-7AF7BEA38ACF}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{319DF7A8-DC73-4760-9190-7AF7BEA38ACF}.Debug|Any CPU.Build.0 = Debug|x64
+		{319DF7A8-DC73-4760-9190-7AF7BEA38ACF}.Debug|x64.ActiveCfg = Debug|x64
+		{319DF7A8-DC73-4760-9190-7AF7BEA38ACF}.Debug|x64.Build.0 = Debug|x64
+		{319DF7A8-DC73-4760-9190-7AF7BEA38ACF}.Debug|x86.ActiveCfg = Debug|Win32
+		{319DF7A8-DC73-4760-9190-7AF7BEA38ACF}.Debug|x86.Build.0 = Debug|Win32
+		{319DF7A8-DC73-4760-9190-7AF7BEA38ACF}.Release|Any CPU.ActiveCfg = Release|Win32
+		{319DF7A8-DC73-4760-9190-7AF7BEA38ACF}.Release|x64.ActiveCfg = Release|x64
+		{319DF7A8-DC73-4760-9190-7AF7BEA38ACF}.Release|x64.Build.0 = Release|x64
+		{319DF7A8-DC73-4760-9190-7AF7BEA38ACF}.Release|x86.ActiveCfg = Release|Win32
+		{319DF7A8-DC73-4760-9190-7AF7BEA38ACF}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

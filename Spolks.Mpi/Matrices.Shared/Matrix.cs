@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using Matrices.Shared.Services;
 
 namespace Matrices.Shared
 {
@@ -38,6 +39,17 @@ namespace Matrices.Shared
         public static Matrix2D<T> FromArray(T[,] array)
         {
             return new Matrix2D<T>((T[,])array.Clone());
+        }
+
+        public static Matrix2D<T> FromArray(T[] array, int rows, int columns)
+        {
+            var result = CreateEmpty(rows, columns);
+            for (int i = 0; i < array.Length; i++)
+            {
+                result[i] = array[i];
+            }
+
+            return result;
         }
 
         public IEnumerable<T> GetRow(int row)

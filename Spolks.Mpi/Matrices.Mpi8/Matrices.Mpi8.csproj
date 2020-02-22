@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Matrices.Mpi8.Files\Matrices.Mpi8.Files.vcxproj" />
     <ProjectReference Include="..\Matrices.Shared.FsharpExtensions\Matrices.Shared.FsharpExtensions.fsproj" />
     <ProjectReference Include="..\Matrices.Shared\Matrices.Shared.csproj" />
   </ItemGroup>

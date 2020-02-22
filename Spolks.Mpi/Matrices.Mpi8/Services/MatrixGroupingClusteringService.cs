@@ -72,7 +72,7 @@ namespace Matrices.Mpi8.Services
             int rank = communicator.Rank;
 
             int resultSize = self.Rows * multiplier.Columns;
-            int[] counts = Arrays.equalPartLengths(resultSize, size).ToArray();
+            int[] counts = Arrays.equalPartLengths(resultSize, size);
             var (firstIndex, lastIndex) = Arrays.getPartIndicesRange(counts, rank);
 
             long[] localResult = MatrixDivisionService.MultiplyFrame(
