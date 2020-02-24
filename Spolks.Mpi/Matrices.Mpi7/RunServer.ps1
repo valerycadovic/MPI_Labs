@@ -39,7 +39,7 @@ $matrixBColumns = Read-Host 'Enter matrix B columns count'
 
 $count = $ipAddresses.Count / 2
 
-mpiexec.exe -p 8677 -hosts $count $ipAddresses -env .\bin\Debug\netcoreapp3.0\Matrices.Mpi7.exe $matrixARows $matrixAColumns $matrixBColumns
+mpiexec.exe -p 8677 -hosts $count $ipAddresses -env .\bin\Debug\netcoreapp3.1\Matrices.Mpi7.exe $matrixARows $matrixAColumns $matrixBColumns
 
 Read-Host -Prompt "Press Enter to continue"
 Stop-Process -InputObject $smpd

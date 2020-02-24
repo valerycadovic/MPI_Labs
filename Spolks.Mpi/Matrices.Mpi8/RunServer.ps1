@@ -41,7 +41,7 @@ $groups = Read-Host 'Enter groups count'
 
 $count = $ipAddresses.Count / 2
 
-mpiexec.exe -p 8677 -hosts $count $ipAddresses .\bin\Debug\netcoreapp3.0\Matrices.Mpi8.exe $matrixARows $matrixAColumns $matrixBColumns $groups
+mpiexec.exe -p 8677 -hosts $count $ipAddresses .\bin\Debug\netcoreapp3.1\Matrices.Mpi8.exe $matrixARows $matrixAColumns $matrixBColumns $groups
 
 Read-Host -Prompt "Press Enter to continue"
 Stop-Process -InputObject $smpd
