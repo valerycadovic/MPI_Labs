@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Matrices.Mpi8": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}

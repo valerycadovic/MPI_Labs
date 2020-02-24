@@ -12,7 +12,7 @@ array<long long>^ FilesMultiplication::MatrixSerializer::ToManagedArray(long lon
 {
 	auto result = gcnew List<long long>();
 	for (int i = 0; i < len; i++) {
-		result->Add(*ptr + i);
+		result->Add(*(ptr + i));
 	}
 
 	return result->ToArray();
