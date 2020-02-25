@@ -23,7 +23,6 @@ FilesMultiplication::FileOperations::FileOperations(String^ fileA, String^ fileB
 	this->_fileB = fileB + const_cast<String^>(FILE_B_NAME);
 	this->_fileResult = fileResult + groupFileResult;
 
-	this->_fileResult = groupFileResult;
 	this->_groupCommunicator = groupCommunicator;
 }
 

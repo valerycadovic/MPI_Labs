@@ -41,7 +41,18 @@ $groups = Read-Host 'Enter groups count'
 
 $count = $ipAddresses.Count / 2
 
-mpiexec.exe -p 8677 -hosts $count $ipAddresses .\bin\Debug\netcoreapp3.1\Matrices.Mpi8.exe $matrixARows $matrixAColumns $matrixBColumns $groups
+$question = 'Select executoin mode'
+$choices  = '&File', '&NoFile'
+
+$decision = $Host.UI.PromptForChoice($title, $question, $choices, 1)
+$f = ''
+$filePath = ''
+if ($decision -eq 0){
+    $f = '-f'
+    $filePath = Read-Host 'Enter files path'
+}
+
+mpiexec.exe -p 8677 -hosts $count $ipAddresses .\bin\Debug\netcoreapp3.1\Matrices.Mpi8.exe $matrixARows $matrixAColumns $matrixBColumns $groups $f
 
 Read-Host -Prompt "Press Enter to continue"
 Stop-Process -InputObject $smpd

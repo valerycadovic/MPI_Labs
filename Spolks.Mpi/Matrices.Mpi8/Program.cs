@@ -12,33 +12,31 @@ namespace Matrices.Mpi8
     {
         static void Main(string[] args)
         {
+            using var env = new MpiEnvironment(ref args);
+
+            int matrixARows = int.Parse(args[0]);
+            int matrixAColumns = int.Parse(args[1]);
+            int matrixBRows = matrixAColumns;
+            int matrixBColumns = int.Parse(args[2]);
+            int groups = int.Parse(args[3]);
+
             if (!args.Contains("-f"))
             {
-                int matrixARows = int.Parse(args[0]);
-                int matrixAColumns = int.Parse(args[1]);
-                int matrixBRows = matrixAColumns;
-                int matrixBColumns = int.Parse(args[2]);
-                int groups = int.Parse(args[3]);
-
                 var matrixA = MatrixService.InitializeByNaturalNumbers(matrixARows, matrixAColumns);
                 var matrixB = MatrixService.InitializeByNaturalNumbers(matrixBRows, matrixBColumns);
-
-                using var env = new MpiEnvironment(ref args);
 
                 MatrixGroupingClusteringService.MultiplyInGroups(matrixA, matrixB, groups);
             }
             else
             {
-                const string path = @"C:\";
+                string path = args[4];
+                var fileOperations = new FileOperations(path, path, path, groups);
 
-                using var env = new MpiEnvironment(ref args);
+                Matrix2D<long> FillA() => MatrixService.InitializeByNaturalNumbers(matrixARows, matrixAColumns);
+                Matrix2D<long> FillB() => MatrixService.InitializeByNaturalNumbers(matrixBRows, matrixBColumns);
 
-                var fileOperations = new FileOperations(path, path, path, 2);
-
-                static Matrix2D<long> Fill() => MatrixService.InitializeByNaturalNumbers(100, 100);
-
-                fileOperations.Fill(Fill, Fill);
-                fileOperations.Multiply();
+                fileOperations.Fill(FillA, FillB);
+                fileOperations.Multiply(); 
                 bool comparison = fileOperations.Compare();
 
                 Console.WriteLine($"Multiplication result: {comparison}");
