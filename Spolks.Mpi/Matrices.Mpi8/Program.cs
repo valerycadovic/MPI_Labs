@@ -33,7 +33,7 @@ namespace Matrices.Mpi8
 
                 using var env = new MpiEnvironment(ref args);
 
-                var fileOperations = new FileOperations(path, path, path, 1);
+                var fileOperations = new FileOperations(path, path, path, 2);
 
                 static Matrix2D<long> Fill() => MatrixService.InitializeByNaturalNumbers(100, 100);
 

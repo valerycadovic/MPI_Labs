@@ -33,25 +33,30 @@ void FilesMultiplication::FileOperations::Fill(
 	int rank;
 	MPI_Comm_rank(this->_groupCommunicator, &rank);
 
-	if (rank == MASTER_RANK) {
-		auto matrixA = fillerA();
-		auto matrixB = fillerB();
+	auto matrixA = fillerA();
+	auto matrixB = fillerB();
 
-		WriteMatrix(matrixA, ToCString(this->_fileA));
-		WriteMatrix(matrixB, ToCString(this->_fileB));
-	}
+	WriteMatrix(matrixA, ToCString(this->_fileA));
+	WriteMatrix(matrixB, ToCString(this->_fileB));
+
+	MPI_Barrier(this->_groupCommunicator);
 }
 
 void FilesMultiplication::FileOperations::Multiply()
 {
 	Matrix2D<long long>^ matrixA = ReadMatrix(ToCString(this->_fileA), this->_groupCommunicator);
 	Matrix2D<long long>^ matrixB = ReadMatrix(ToCString(this->_fileB), this->_groupCommunicator);
-	
+
+	MPI_Barrier(this->_groupCommunicator);
 	MultiplyToFile(matrixA, matrixB, this->_groupCommunicator);
 }
 
 bool FilesMultiplication::FileOperations::Compare()
 {
+	int rank, size;
+	MPI_Comm_size(this->_groupCommunicator, &size);
+	MPI_Comm_rank(this->_groupCommunicator, &rank);
+
 	Matrix2D<long long>^ matrixA = ReadMatrix(ToCString(this->_fileA), this->_groupCommunicator);
 	Matrix2D<long long>^ matrixB = ReadMatrix(ToCString(this->_fileB), this->_groupCommunicator);
 
@@ -70,12 +75,13 @@ void FilesMultiplication::FileOperations::MultiplyToFile(
 	MPI_Comm_size(this->_groupCommunicator, &size);
 
 	int resultSize = matrixA->Rows * matrixA->Columns;
-	array<int>^ counts = Arrays::equalPartLengths(resultSize, this->_groups);
+	array<int>^ counts = Arrays::equalPartLengths(resultSize, size);
 	ValueTuple<int, int> frameRange = Arrays::getPartIndicesRange(counts, rank);
 
 	array<long long>^ localResult = Enumerable::ToArray(MatrixDivisionService
 		::MultiplyFrame(frameRange.Item1, frameRange.Item2, matrixB->Columns, matrixA, matrixB));
 
+	MPI_Barrier(this->_groupCommunicator);
 	WriteFrame(localResult, matrixA->Rows, matrixB->Columns, frameRange.Item1);
 }
 
@@ -90,12 +96,11 @@ void FilesMultiplication::FileOperations::WriteFrame(array<long long>^ frame, in
 		MPI_MODE_CREATE | MPI_MODE_RDWR, MPI_INFO_NULL, &file);
 
 	if (rank == MASTER_RANK) {
-		MPI_File_write_at_all(file, 0, &rows, 1, MPI_INT, MPI_STATUSES_IGNORE);
-		MPI_File_write_at_all(file, sizeof(int), &columns, 1, MPI_INT, MPI_STATUSES_IGNORE);
+		MPI_File_write_at(file, 0, &rows, 1, MPI_INT, MPI_STATUSES_IGNORE);
+		MPI_File_write_at(file, sizeof(int), &columns, 1, MPI_INT, MPI_STATUSES_IGNORE);
 	}
 
 	const long long* localResult_ptr = ToCArray(frame);
-
 	int length = frame->Length;
 
 	MPI_File_write_at_all(file, start * sizeof(long long) + 2 * sizeof(int),
