@@ -10,32 +10,46 @@ namespace Matrices.Mpi7.Services
     public static class MatrixClusteringService
     {
         private const int MasterRank = 0;
-        private const int Tag = 10;
 
         public static Matrix2D<long> ClusteredMultiplyByAsync(this Matrix2D<long> self,
             Matrix2D<long> multiplier)
         {
-            Communicator communicator = Communicator.world;
+            var communicator = Communicator.world;
             int size = communicator.Size;
             int rank = communicator.Rank;
 
+            var counts = Arrays.equalPartLengths(self.Rows * multiplier.Columns, size);
+            var (firstIndex, lastIndex) = Arrays.getPartIndicesRange(counts, rank);
+
+            communicator.Broadcast(ref multiplier, MasterRank);
+
             var result = Matrix2D<long>.CreateEmpty(self.Rows, multiplier.Columns);
-            var rankRange = result.GetFrameIndexes(rank, size);
 
             if (rank == MasterRank)
             {
                 var requestList = new RequestList();
                 var requests = new List<ReceiveRequest>();
 
-                for (int i = size - 1; i > 0; i--)
+                for (int i = 0; i < size; i++)
                 {
-                    ReceiveRequest request = communicator.ImmediateReceive<MatrixFrame>(source: i, Tag);
-                    requestList.Add(request);
-                    requests.Add(request);
+                    if (i == MasterRank)
+                    {
+                        continue;
+                    }
+
+                    var (firstRankIndex, lastRankIndex) = Arrays.getPartIndicesRange(counts, i);
+
+                    for (var currentIndex = firstRankIndex; currentIndex < lastRankIndex; currentIndex += result.Columns)
+                    {
+                        ReceiveRequest request = communicator.ImmediateReceive<MatrixFrame>(source: i, currentIndex);
+
+                        requestList.Add(request);
+                        requests.Add(request);
+                    }
                 }
 
-                var rankResults = MultiplyFrame(rankRange.first, rankRange.last, result.Columns, self, multiplier);
-                result.CommitFrame(rankRange.first, rankRange.last, rankResults.ToArray());
+                var rankResults = MultiplyFrame(firstIndex, lastIndex, result.Columns, self, multiplier);
+                result.CommitFrame(firstIndex, lastIndex, rankResults.ToArray());
 
                 requestList.WaitAll();
 
@@ -46,41 +60,56 @@ namespace Matrices.Mpi7.Services
 
                 return result;
             }
+            else
+            {
+                var requestList = new RequestList();
 
-            var results = MultiplyFrame(rankRange.first, rankRange.last, result.Columns, self, multiplier);
-            var frame = new MatrixFrame(rankRange.first, rankRange.last, results.ToArray());
-            var sendRequest = communicator.ImmediateSend(frame, MasterRank, Tag);
-            sendRequest.Wait();
+                for (var currentIndex = firstIndex; currentIndex < lastIndex; currentIndex += result.Columns)
+                {
+                    var first = currentIndex;
+                    var last = currentIndex + result.Columns - 1;
 
-            return null;
+                    var currentMultiplicationResults = MultiplyFrame(first, last, result.Columns, self, multiplier);
+                    var frame = new MatrixFrame(first, last, currentMultiplicationResults.ToArray());
+
+                    var sendRequest = communicator.ImmediateSend(frame, MasterRank, currentIndex);
+                    requestList.Add(sendRequest);
+                }
+
+                requestList.WaitAll();
+
+                return null;
+            }
         }
 
         public static Matrix2D<long> ClusteredMultiplyBy(
             this Matrix2D<long> self, Matrix2D<long> multiplier)
         {
-            Communicator communicator = Communicator.world;
+            var communicator = Communicator.world;
             int size = communicator.Size;
             int rank = communicator.Rank;
 
-            var result = Matrix2D<long>.CreateEmpty(self.Rows, multiplier.Columns);
-            var rankRange = result.GetFrameIndexes(rank, size);
-            var rankResults = MultiplyFrame(rankRange.first, rankRange.last, result.Columns, self, multiplier);
+            communicator.Broadcast(ref multiplier, MasterRank);
+
+            var counts = Arrays.equalPartLengths(self.Rows * multiplier.Columns, size);
+            var (firstIndex, lastIndex) = Arrays.getPartIndicesRange(counts, rank);
+
+            var scatterResult = communicator.ScatterFromFlattened(self.ToArray(), counts, MasterRank);
+            self.CommitFrame(firstIndex, lastIndex, scatterResult);
+
+            var localResult = MultiplyFrame(firstIndex, lastIndex, multiplier.Columns, self, multiplier).ToArray();
 
             if (rank == MasterRank)
             {
-                result.CommitFrame(rankRange.first, rankRange.last, rankResults.ToArray());
-
-                for (int i = size - 1; i > 0; i--)
-                {
-                    communicator.Receive(Unsafe.MPI_ANY_SOURCE, Tag, out MatrixFrame outFrame);
-                    result.CommitFrame(outFrame.First, outFrame.Last, outFrame.Results);
-                }
+                var globalResult = communicator.GatherFlattened(localResult, counts, MasterRank);
+                
+                var result = Matrix2D<long>.CreateEmpty(self.Rows, multiplier.Columns);
+                result.CommitFrame(0, result.Size - 1, globalResult);
 
                 return result;
             }
 
-            var frame = new MatrixFrame(rankRange.first, rankRange.last, rankResults.ToArray());
-            communicator.Send(frame, MasterRank, Tag);
+            communicator.GatherFlattened(localResult, counts, MasterRank);
 
             return null;
         }

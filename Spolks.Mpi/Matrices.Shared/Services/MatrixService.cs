@@ -49,5 +49,19 @@ namespace Matrices.Shared.Services
 
             return result;
         }
+
+        public static Matrix2D<long> InitializeByRandomNumbers(int rows, int columns)
+        {
+            var random = new Random();
+
+            var result = Matrix2D<long>.CreateEmpty(rows, columns);
+
+            for (int i = 0; i < result.Size; i++)
+            {
+                result[i] = random.Next(short.MaxValue);
+            }
+
+            return result;
+        }
     }
 }

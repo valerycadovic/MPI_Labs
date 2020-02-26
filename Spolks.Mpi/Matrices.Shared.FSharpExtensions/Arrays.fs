@@ -10,7 +10,7 @@
             if groups <= 1 then
                 [len]
             else 
-                let division = (len / groups) + 1
+                let division = (len / groups)
                 division::getRec(len - division, groups - 1)
 
         getRec(len, groups).ToArray();

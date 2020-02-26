@@ -18,29 +18,44 @@ namespace Matrices.Mpi7
             int matrixBRows = matrixAColumns;
             int matrixBColumns = int.Parse(args[2]);
 
-            var matrixA = InitializeByNaturalNumbers(matrixARows, matrixAColumns);
-            var matrixB = InitializeByNaturalNumbers(matrixBRows, matrixBColumns);
-
             string[] mpiArgs = { };
             using var environment = new MpiEnvironment(ref mpiArgs);
 
-            double startBlocking = MPI_Wtime();
-            var matrixC = matrixA.ClusteredMultiplyBy(matrixB);
-            double endBlocking = MPI_Wtime();
-            Matrix2D<long> matrixD = null;
+            Matrix2D<long> matrixA;
+            Matrix2D<long> matrixB;
+            Matrix2D<long> controlMatrix = null;
 
-            if (matrixC != null)
+            if (Communicator.world.Rank == 0)
             {
-                double startNonParallel = MPI_Wtime();
-                matrixD = matrixA.MultiplyBy(matrixB);
-                double endNonParallel = MPI_Wtime();
-
-                Console.WriteLine($"Non parallel execution time: {endNonParallel - startNonParallel}");
-                Console.WriteLine($"Parallel blocking time: {endBlocking - startBlocking}");
-                Console.WriteLine($"Non parallel and blocking results equality: {CompareMatrices(matrixD, matrixC)}");
+                matrixA = InitializeByRandomNumbers(matrixARows, matrixAColumns);
+                matrixB = InitializeByRandomNumbers(matrixBRows, matrixBColumns);
+            }
+            else
+            {
+                matrixA = Matrix2D<long>.CreateEmpty(matrixARows, matrixAColumns);
+                matrixB = Matrix2D<long>.CreateEmpty(matrixBRows, matrixBColumns);
             }
 
-            Communicator.world.Barrier();
+            if (Communicator.world.Rank == 0)
+            {
+                double startNonParallel = MPI_Wtime();
+                controlMatrix = matrixA.MultiplyBy(matrixB);
+                double endNonParallel = MPI_Wtime();
+
+                Console.WriteLine($"\nNon parallel blocking time: {endNonParallel - startNonParallel}");
+            }
+
+            //double startBlocking = MPI_Wtime();
+            //var matrixC = matrixA.ClusteredMultiplyBy(matrixB);
+            //double endBlocking = MPI_Wtime();
+
+            //if (matrixC != null)
+            //{
+            //    Console.WriteLine($"\nParallel blocking time: {endBlocking - startBlocking}");
+            //    Console.WriteLine($"Results equality: {CompareMatrices(controlMatrix, matrixC)}");
+            //}
+
+            //Communicator.world.Barrier();
 
             double startNonBlocking = MPI_Wtime();
             var matrixE = matrixA.ClusteredMultiplyByAsync(matrixB);
@@ -48,8 +63,8 @@ namespace Matrices.Mpi7
 
             if (matrixE != null)
             {
-                Console.WriteLine($"Non parallel and non blocking results equality: {CompareMatrices(matrixD, matrixE)}");
-                Console.WriteLine($"Parallel non blocking time: {endNonBlocking - startNonBlocking}");
+                Console.WriteLine($"\nParallel non blocking time: {endNonBlocking - startNonBlocking}");
+                Console.WriteLine($"Results equality: {CompareMatrices(controlMatrix, matrixE)}");
             }
         }
     }
