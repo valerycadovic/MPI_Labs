@@ -31,9 +31,6 @@ for ($i = 0; $i -lt $hosts; $i++) {
 
 $ips = [string]::Join(' ', $ipAddresses)
 
-Start-Process -FilePath "smpd.exe" -ArgumentList ("-p", "8677", "-d", "0")
-$smpd = Get-Process -Name "smpd"
-
 $matrixARows = Read-Host 'Enter matrix A rows count'
 $matrixAColumns = Read-Host 'Enter matrix A columns and matrix B rows count'
 $matrixBColumns = Read-Host 'Enter matrix B columns count'
@@ -47,12 +44,19 @@ $choices  = '&File', '&NoFile'
 $decision = $Host.UI.PromptForChoice($title, $question, $choices, 1)
 $f = ''
 $filePath = ''
+$smpd = ''
 if ($decision -eq 0){
     $f = '-f'
     $filePath = Read-Host 'Enter files path'
+}
+else {
+    Start-Process -FilePath "smpd.exe" -ArgumentList ("-p", "8677", "-d", "0")
+    $smpd = Get-Process -Name "smpd"
 }
 
 mpiexec.exe -p 8677 -hosts $count $ipAddresses .\bin\Debug\netcoreapp3.1\Matrices.Mpi8.exe $matrixARows $matrixAColumns $matrixBColumns $groups $f
 
 Read-Host -Prompt "Press Enter to continue"
-Stop-Process -InputObject $smpd
+if ($smpd -ne '') {
+    Stop-Process -InputObject $smpd
+}
