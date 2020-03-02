@@ -1,8 +1,7 @@
 $processes = Read-Host 'Enter count of processes'
-$matrixARows = Read-Host 'Enter matrix A rows count'
-$matrixAColumns = Read-Host 'Enter matrix A columns and matrix B rows count'
-$matrixBColumns = Read-Host 'Enter matrix B columns count'
+$matrixN = Read-Host 'Enter matrix N'
+$rowsPerCycle = Read-Host 'Enter rows per cycle'
 
-mpiexec -n $processes .\bin\Debug\netcoreapp3.1\Matrices.Mpi7.exe $matrixARows $matrixAColumns $matrixBColumns
+mpiexec -n $processes .\bin\Debug\netcoreapp3.1\Matrices.Mpi7.exe $matrixN $matrixN $matrixN $rowsPerCycle
 
 Read-Host -Prompt "Press Enter to continue"

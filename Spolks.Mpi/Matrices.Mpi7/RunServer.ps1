@@ -33,13 +33,12 @@ $ips = [string]::Join(' ', $ipAddresses)
 Start-Process -FilePath "smpd.exe" -ArgumentList ("-p", "8677", "-d", "0")
 $smpd = Get-Process -Name "smpd"
 
-$matrixARows = Read-Host 'Enter matrix A rows count'
-$matrixAColumns = Read-Host 'Enter matrix A columns and matrix B rows count'
-$matrixBColumns = Read-Host 'Enter matrix B columns count'
+$matrixN = Read-Host 'Enter matrix N'
+$rowsPerCycle = Read-Host 'Enter rows per cycle'
 
 $count = $ipAddresses.Count / 2
 
-mpiexec.exe -p 8677 -hosts $count $ipAddresses -env .\bin\Debug\netcoreapp3.1\Matrices.Mpi7.exe $matrixARows $matrixAColumns $matrixBColumns
+mpiexec.exe -p 8677 -hosts $count $ipAddresses -env .\bin\Debug\netcoreapp3.1\Matrices.Mpi7.exe $matrixN $matrixN $matrixN $rowsPerCycle
 
 Read-Host -Prompt "Press Enter to continue"
 Stop-Process -InputObject $smpd

@@ -58,7 +58,7 @@ namespace Matrices.Shared.Services
 
             for (int i = 0; i < result.Size; i++)
             {
-                result[i] = random.Next(short.MaxValue);
+                result[i] = random.Next(byte.MaxValue);
             }
 
             return result;

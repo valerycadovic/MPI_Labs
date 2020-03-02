@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using Matrices.Shared.Services;
+using System.Runtime.InteropServices;
 
 namespace Matrices.Shared
 {
@@ -18,7 +18,9 @@ namespace Matrices.Shared
 
         private Matrix2D(T[,] matrix)
         {
-            _matrix = matrix ?? throw new ArgumentNullException($"{nameof(matrix)} cannot be null");
+            var pinned = GCHandle.Alloc(matrix, GCHandleType.Pinned);
+
+            _matrix = (T[,]) pinned.Target ?? throw new ArgumentNullException($"{nameof(matrix)} cannot be null");
 
             Rows = _matrix.GetLength(0);
             Columns = _matrix.GetLength(1);
@@ -38,7 +40,7 @@ namespace Matrices.Shared
 
         public static Matrix2D<T> FromArray(T[,] array)
         {
-            return new Matrix2D<T>((T[,])array.Clone());
+            return new Matrix2D<T>((T[,]) array.Clone());
         }
 
         public static Matrix2D<T> FromArray(T[] array, int rows, int columns)
@@ -65,22 +67,6 @@ namespace Matrices.Shared
             for (int i = 0; i < Rows; i++)
             {
                 yield return _matrix[i, column];
-            }
-        }
-
-        public IEnumerable<IEnumerable<T>> GetRows()
-        {
-            for (int i = 0; i < this.Rows; i++)
-            {
-                yield return this.GetRow(i);
-            }
-        }
-
-        public IEnumerable<IEnumerable<T>> GetColumns()
-        {
-            for (int i = 0; i < this.Columns; i++)
-            {
-                yield return this.GetColumn(i);
             }
         }
 

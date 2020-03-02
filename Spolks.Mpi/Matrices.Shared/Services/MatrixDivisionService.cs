@@ -13,10 +13,11 @@ namespace Matrices.Shared.Services
                 int i = absoluteIndex / columns;
                 int j = absoluteIndex % columns;
 
-                yield return a.GetRow(i)
-                    .Zip(b.GetColumn(j))
-                    .Select(tuple => tuple.First * tuple.Second)
-                    .Aggregate((f, s) => f + s);
+                long sum = 0;
+                for (int k = 0; k < columns; k++)
+                    sum += a[i, k] * b[k, j];
+
+                yield return sum;
             }
         }
 
