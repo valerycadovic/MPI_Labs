@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using Matrices.Shared;
@@ -17,8 +16,8 @@ namespace Matrices.Mpi7.Services
             Matrix2D<long> multiplier, int rowsPerCycle)
         {
             var communicator = Communicator.world;
-            int size = communicator.Size;
-            int rank = communicator.Rank;
+            Unsafe.MPI_Comm_rank(MpiUnsafe.MPI_COMM_WORLD, out var rank);
+            Unsafe.MPI_Comm_size(MpiUnsafe.MPI_COMM_WORLD, out var size);
 
             var globalCounts = Arrays.equalPartLengths(self.Rows * multiplier.Columns, size);
             var (firstIndex, lastIndex) = Arrays.getPartIndicesRange(globalCounts, rank);
@@ -33,7 +32,7 @@ namespace Matrices.Mpi7.Services
             var displacement = Enumerable.Range(0, size).Select((_, index) => globalCounts.Take(index).Sum()).ToArray();
 
             var buffer0 = (long[]) GCHandle.Alloc(new long[counts[rank]], GCHandleType.Pinned).Target;
-            var buffer1 = (long[])GCHandle.Alloc(new long[counts[rank]], GCHandleType.Pinned).Target;
+            var buffer1 = (long[]) GCHandle.Alloc(new long[counts[rank]], GCHandleType.Pinned).Target;
 
             MpiUnsafe.MPI_Scatterv(
                 Marshal.UnsafeAddrOfPinnedArrayElement(selfMatrix, 0),
@@ -78,14 +77,8 @@ namespace Matrices.Mpi7.Services
                 if (i != 0)
                 {
                     var request = requestsList[i - 1];
-                    Unsafe.MPI_Wait(ref request, out var status);
 
-                    for (int asd = first, cd = 0; asd < last; asd++, cd++)
-                    {
-                        if ((i % 2 == 1 ? buffer1 : buffer0)[cd] != asd) {
-                            Console.WriteLine($"Rank: {rank}: [{cd}] {asd} = {(i % 2 == 1 ? buffer1 : buffer0)[cd]}");
-                        }
-                    }
+                    Unsafe.MPI_Wait(ref request, out var status);
                 }
 
                 self.CommitFrame(first, last, i % 2 == 1 ? buffer1 : buffer0);
@@ -138,7 +131,7 @@ namespace Matrices.Mpi7.Services
 
             self.CommitFrame(firstIndex, lastIndex, scatterResult);
 
-            var localResult = MatrixDivisionService.MultiplyFrame(firstIndex, lastIndex, multiplier.Columns, self, multiplier).ToArray();
+            var localResult = MatrixDivisionService.MultiplyFramе(firstIndex, lastIndex, multiplier.Columns, self, multiplier).ToArray();
 
             var globalResult = new long[self.Rows * multiplier.Columns];
 
