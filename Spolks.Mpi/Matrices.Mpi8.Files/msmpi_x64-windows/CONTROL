@@ -1,0 +1,7 @@
+Package: msmpi
+Version: 10.0-2
+Architecture: x64-windows
+Multi-Arch: same
+Abi: 04c8464551957f886d772c514ba31f57abac911f
+Description: Microsoft MPI
+Type: Port
