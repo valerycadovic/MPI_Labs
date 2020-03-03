@@ -9,7 +9,7 @@ namespace FilesMultiplication {
 	ref class MatrixSerializer abstract sealed
 	{
 	public:
-		static Matrix2D<long long>^ DeserializeMatrix(int rows, int columns, long long* values);
+		static Matrix2D<long long>^ DeserializeMatrix(int rows, int columns, long long* values, int start, int length);
 	private:
 		static array<long long>^ ToManagedArray(long long* ptr, int len);
 	};

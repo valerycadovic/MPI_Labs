@@ -23,7 +23,6 @@ FilesMultiplication::FileOperations::FileOperations(String^ fileA, String^ fileB
 	this->_fileB = fileB + const_cast<String^>(FILE_B_NAME);
 	this->_fileResult = fileResult + groupFileResult;
 
-	this->_fileResult = groupFileResult;
 	this->_groupCommunicator = groupCommunicator;
 }
 
@@ -44,7 +43,7 @@ void FilesMultiplication::FileOperations::Fill(
 
 void FilesMultiplication::FileOperations::Multiply()
 {
-	Matrix2D<long long>^ matrixA = ReadMatrix(ToCString(this->_fileA), this->_groupCommunicator);
+	Matrix2D<long long>^ matrixA = ReadMatrixPart(ToCString(this->_fileA), this->_groupCommunicator);
 	Matrix2D<long long>^ matrixB = ReadMatrix(ToCString(this->_fileB), this->_groupCommunicator);
 
 	MPI_Barrier(this->_groupCommunicator);
@@ -110,6 +109,49 @@ void FilesMultiplication::FileOperations::WriteFrame(array<long long>^ frame, in
 	MPI_File_close(&file);
 }
 
+Matrix2D<long long>^ FilesMultiplication::FileOperations::ReadMatrixPart(const char* filePath, MPI_Comm communicator)
+{
+	MPI_File file;
+	int err = MPI_File_open(communicator, filePath, MPI_MODE_RDONLY, MPI_INFO_NULL, &file);
+
+	if (err) {
+		MPI_Abort(communicator, MPI_ERR_BAD_FILE);
+		throw gcnew SystemException("cannot open file " + gcnew String(filePath));
+	}
+
+	void* singleBuffer = new int[1];
+	MPI_File_read_at(file, 0, singleBuffer, 1, MPI_INT, MPI_STATUSES_IGNORE);
+	int* rows_ptr = reinterpret_cast<int*>(singleBuffer);
+
+	MPI_File_read_at(file, sizeof(int), singleBuffer, 1, MPI_INT, MPI_STATUSES_IGNORE);
+	int* columns_ptr = reinterpret_cast<int*>(singleBuffer);
+
+	int rows = *rows_ptr;
+	int columns = *columns_ptr;
+	int resultSize = rows * columns;
+
+	int rank, size;
+
+	MPI_Comm_rank(communicator, &rank);
+	MPI_Comm_size(communicator, &size);
+
+	array<int>^ counts = Arrays::equalPartLengths(resultSize, size);
+	ValueTuple<int, int> frameRange = Arrays::getPartIndicesRange(counts, rank);
+
+	int length = frameRange.Item2 - frameRange.Item1 + 1;
+	long long* buffer = new long long[length];
+
+	int code = MPI_File_read_at_all(file, 2 * sizeof(int) + frameRange.Item1 * sizeof(long long), static_cast<void*>(buffer), length, MPI_LONG_LONG, MPI_STATUSES_IGNORE);
+
+	MPI_File_close(&file);
+
+	Matrix2D<long long>^ matrix = MatrixSerializer::DeserializeMatrix(rows, columns, buffer, frameRange.Item1, length);
+
+	delete[] buffer;
+	delete[] singleBuffer;
+	return matrix;
+}
+
 Matrix2D<long long>^ FilesMultiplication::FileOperations::ReadMatrix(const char* filePath, MPI_Comm communicator)
 {
 	MPI_File file;
@@ -135,7 +177,7 @@ Matrix2D<long long>^ FilesMultiplication::FileOperations::ReadMatrix(const char*
 	int code = MPI_File_read_at(file, 2 * sizeof(int), static_cast<void*>(buffer), length, MPI_LONG_LONG, MPI_STATUSES_IGNORE);
 	MPI_File_close(&file);
 
-	Matrix2D<long long>^ matrix = MatrixSerializer::DeserializeMatrix(rows, columns, buffer);
+	Matrix2D<long long>^ matrix = MatrixSerializer::DeserializeMatrix(rows, columns, buffer, 0, length);
 
 	delete[] buffer;
 	delete[] singleBuffer;

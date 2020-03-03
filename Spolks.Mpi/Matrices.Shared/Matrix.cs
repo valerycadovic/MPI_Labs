@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices;
 
 namespace Matrices.Shared
@@ -43,12 +44,12 @@ namespace Matrices.Shared
             return new Matrix2D<T>((T[,]) array.Clone());
         }
 
-        public static Matrix2D<T> FromArray(T[] array, int rows, int columns)
+        public static Matrix2D<T> FromArray(T[] array, int rows, int columns, int start = 0)
         {
             var result = CreateEmpty(rows, columns);
             for (int i = 0; i < array.Length; i++)
             {
-                result[i] = array[i];
+                result[start + i] = array[i];
             }
 
             return result;

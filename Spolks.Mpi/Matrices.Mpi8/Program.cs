@@ -12,16 +12,13 @@ namespace Matrices.Mpi8
     {
         static void Main(string[] args)
         {
+            int matrixN = int.Parse(args[0]);
+            int groups = int.Parse(args[1]);
+
             if (!args.Contains("-f"))
             {
-                int matrixARows = int.Parse(args[0]);
-                int matrixAColumns = int.Parse(args[1]);
-                int matrixBRows = matrixAColumns;
-                int matrixBColumns = int.Parse(args[2]);
-                int groups = int.Parse(args[3]);
-
-                var matrixA = MatrixService.InitializeByNaturalNumbers(matrixARows, matrixAColumns);
-                var matrixB = MatrixService.InitializeByNaturalNumbers(matrixBRows, matrixBColumns);
+                var matrixA = MatrixService.InitializeByNaturalNumbers(matrixN, matrixN);
+                var matrixB = MatrixService.InitializeByNaturalNumbers(matrixN, matrixN);
 
                 using var env = new MpiEnvironment(ref args);
 
@@ -33,15 +30,20 @@ namespace Matrices.Mpi8
 
                 using var env = new MpiEnvironment(ref args);
 
-                var fileOperations = new FileOperations(path, path, path, 2);
+                var fileOperations = new FileOperations(path, path, path, groups);
 
-                static Matrix2D<long> Fill() => MatrixService.InitializeByNaturalNumbers(100, 100);
+                Matrix2D<long> Fill() => MatrixService.InitializeByRandomNumbers(matrixN, matrixN);
 
                 fileOperations.Fill(Fill, Fill);
+
+                double startTime = MPI.Unsafe.MPI_Wtime();
                 fileOperations.Multiply();
+                double endTime = MPI.Unsafe.MPI_Wtime();
+
                 bool comparison = fileOperations.Compare();
 
-                Console.WriteLine($"Multiplication result: {comparison}");
+                Console.WriteLine($"\nGroup time: {endTime - startTime}");
+                Console.WriteLine($"Multiplication results equlity: {comparison}");
             }
         }
     }

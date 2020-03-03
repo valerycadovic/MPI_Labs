@@ -1,9 +1,7 @@
 $processes = Read-Host 'Enter count of processes'
-$matrixARows = Read-Host 'Enter matrix A rows count'
-$matrixAColumns = Read-Host 'Enter matrix A columns and matrix B rows count'
-$matrixBColumns = Read-Host 'Enter matrix B columns count'
+$matrixN = Read-Host 'Enter matrix N'
 $groups = Read-Host 'Enter groups count'
 
-mpiexec -n $processes .\bin\Debug\netcoreapp3.1\Matrices.Mpi8.exe $matrixARows $matrixAColumns $matrixBColumns $groups
+mpiexec -n $processes .\bin\Debug\netcoreapp3.1\Matrices.Mpi8.exe $matrixN $groups -f
 
 Read-Host -Prompt "Press Enter to continue"

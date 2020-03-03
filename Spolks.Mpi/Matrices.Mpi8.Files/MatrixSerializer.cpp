@@ -1,11 +1,10 @@
 #include "MatrixSerializer.h"
 
-Matrix2D<long long>^ FilesMultiplication::MatrixSerializer::DeserializeMatrix(int rows, int columns, long long* values)
+Matrix2D<long long>^ FilesMultiplication::MatrixSerializer::DeserializeMatrix(int rows, int columns, long long* values, int start, int length)
 {
-	int len = rows * columns;
-	array<long long>^ managedValues = ToManagedArray(values, len);
+	array<long long>^ managedValues = ToManagedArray(values, length);
 
-	return Matrix2D<long long>::FromArray(managedValues, rows, columns);
+	return Matrix2D<long long>::FromArray(managedValues, rows, columns, start);
 }
 
 array<long long>^ FilesMultiplication::MatrixSerializer::ToManagedArray(long long* ptr, int len)
