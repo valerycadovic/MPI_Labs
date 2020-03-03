@@ -7,6 +7,7 @@ using MpiEnvironment = MPI.Environment;
 using static MPI.Unsafe;
 using static Matrices.Shared.Services.MatrixService;
 using System.Linq;
+using Matrices.Shared.Unsafe;
 
 namespace Matrices.Mpi7
 {
@@ -46,6 +47,8 @@ namespace Matrices.Mpi7
 
                 Console.WriteLine($"\nNon parallel blocking time: {endNonParallel - startNonParallel}");
             }
+
+            Unsafe.MPI_Barrier(MpiUnsafe.MPI_COMM_WORLD);
 
             {
                 var localMatrixA = Matrix2D<long>.FromArray(matrixA.ToArray(), matrixA.Rows, matrixA.Columns);

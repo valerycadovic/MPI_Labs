@@ -38,7 +38,7 @@ $rowsPerCycle = Read-Host 'Enter rows per cycle'
 
 $count = $ipAddresses.Count / 2
 
-mpiexec.exe -p 8677 -hosts $count $ipAddresses -env .\bin\Debug\netcoreapp3.1\Matrices.Mpi7.exe $matrixN $matrixN $matrixN $rowsPerCycle
+mpiexec.exe -p 8677 -hosts $count $ipAddresses .\bin\Debug\netcoreapp3.1\Matrices.Mpi7.exe $matrixN $matrixN $matrixN $rowsPerCycle
 
 Read-Host -Prompt "Press Enter to continue"
 Stop-Process -InputObject $smpd
