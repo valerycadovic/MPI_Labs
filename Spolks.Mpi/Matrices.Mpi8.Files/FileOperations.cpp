@@ -14,6 +14,8 @@ FilesMultiplication::FileOperations::FileOperations(String^ fileA, String^ fileB
 
 	MPI_Group currentGroup = this->CreateCroups(world)[rank];
 
+	this->_currentGroup = currentGroup;
+
 	MPI_Comm groupCommunicator;
 	MPI_Comm_create(world, currentGroup, &groupCommunicator);
 
@@ -32,6 +34,8 @@ void FilesMultiplication::FileOperations::Fill(
 	int rank;
 	MPI_Comm_rank(this->_groupCommunicator, &rank);
 
+	Rank = rank;
+
 	auto matrixA = fillerA();
 	auto matrixB = fillerB();
 
@@ -43,11 +47,29 @@ void FilesMultiplication::FileOperations::Fill(
 
 void FilesMultiplication::FileOperations::Multiply()
 {
+	int rank;
+	MPI_Comm_rank(this->_groupCommunicator, &rank);
+
+	double startTime = MPI_Wtime();
+
 	Matrix2D<long long>^ matrixA = ReadMatrixPart(ToCString(this->_fileA), this->_groupCommunicator);
 	Matrix2D<long long>^ matrixB = ReadMatrix(ToCString(this->_fileB), this->_groupCommunicator);
 
 	MPI_Barrier(this->_groupCommunicator);
 	MultiplyToFile(matrixA, matrixB, this->_groupCommunicator);
+
+	MPI_Barrier(this->_groupCommunicator);
+
+	double endTime = MPI_Wtime();
+
+	if (rank == 0) {
+		System::Console::WriteLine("Group " + Math::Abs(this->_currentGroup) + " time: " + (endTime - startTime));
+	}
+
+	bool equality = Compare();
+	if (rank == 0) {
+		System::Console::WriteLine("Group " + Math::Abs(this->_currentGroup) + " equality: " + equality);
+	}
 }
 
 bool FilesMultiplication::FileOperations::Compare()

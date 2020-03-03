@@ -29,8 +29,11 @@ namespace FilesMultiplication {
 
 		int _groups;
 		MPI_Comm _groupCommunicator;
+		MPI_Group _currentGroup;
 
 	public:
+		int Rank;
+
 		FileOperations(String^ fileA, String^ fileB, String^ fileResult, int groups);
 		
 		void Fill(Func<Matrix2D<long long>^>^ fillerA, Func<Matrix2D<long long>^>^ fillerB);
