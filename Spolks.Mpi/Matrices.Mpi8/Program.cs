@@ -35,15 +35,7 @@ namespace Matrices.Mpi8
                 Matrix2D<long> Fill() => MatrixService.InitializeByRandomNumbers(matrixN, matrixN);
 
                 fileOperations.Fill(Fill, Fill);
-
-                double startTime = MPI.Unsafe.MPI_Wtime();
                 fileOperations.Multiply();
-                double endTime = MPI.Unsafe.MPI_Wtime();
-
-                bool comparison = fileOperations.Compare();
-
-                Console.WriteLine($"\nGroup time: {endTime - startTime}");
-                Console.WriteLine($"Multiplication results equlity: {comparison}");
             }
         }
     }
